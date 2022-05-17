@@ -1,7 +1,17 @@
 package ru.jproj.pocketstorage.bot.fsm;
 
-public enum State {
-    STATE_1,
-    STATE_2,
-    STATE_3;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Update;
+import ru.jproj.pocketstorage.bot.UserState;
+
+public abstract class State {
+    UserState userState;
+    TelegramBot bot;
+
+    public State(UserState userState, TelegramBot bot) {
+        this.userState = userState;
+        this.bot = bot;
+    }
+
+    public abstract void handle(Update update);
 }
