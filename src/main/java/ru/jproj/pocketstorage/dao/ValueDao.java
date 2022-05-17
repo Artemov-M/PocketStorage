@@ -4,7 +4,8 @@ import ru.jproj.pocketstorage.entity.Value;
 import ru.jproj.pocketstorage.exception.DaoException;
 import ru.jproj.pocketstorage.util.ConnectionPool;
 
-import java.sql.*;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,9 @@ public class ValueDao {
             WHERE key_id = ?
             ORDER BY id
             """;
-    private ValueDao() {};
+
+    private ValueDao() {
+    }
 
     public static ValueDao getInstance() {
         return INSTANCE;

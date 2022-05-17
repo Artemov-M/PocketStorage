@@ -4,7 +4,8 @@ import ru.jproj.pocketstorage.entity.User;
 import ru.jproj.pocketstorage.exception.DaoException;
 import ru.jproj.pocketstorage.util.ConnectionPool;
 
-import java.sql.*;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 
 public class UserDao {
@@ -31,7 +32,8 @@ public class UserDao {
             WHERE user_hash = ?
             """;
 
-    private UserDao() {};
+    private UserDao() {
+    }
 
     public static UserDao getInstance() {
         return INSTANCE;
@@ -63,9 +65,13 @@ public class UserDao {
         }
     }
 
+    public User save(String userHash) {
+        return save(new User(-1L, userHash));
+    }
+
     public Optional<User> findById(Long id) {
         try (var connection = ConnectionPool.get();
-             var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL);) {
+             var preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL)) {
             preparedStatement.setLong(1, id);
             var resultSet = preparedStatement.executeQuery();
             User user = null;
@@ -81,7 +87,7 @@ public class UserDao {
 
     public Optional<User> findByHash(String hash) {
         try (var connection = ConnectionPool.get();
-             var preparedStatement = connection.prepareStatement(FIND_BY_HASH_SQL);) {
+             var preparedStatement = connection.prepareStatement(FIND_BY_HASH_SQL)) {
             preparedStatement.setString(1, hash);
             var resultSet = preparedStatement.executeQuery();
             User user = null;

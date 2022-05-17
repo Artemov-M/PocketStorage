@@ -5,7 +5,8 @@ import ru.jproj.pocketstorage.entity.User;
 import ru.jproj.pocketstorage.exception.DaoException;
 import ru.jproj.pocketstorage.util.ConnectionPool;
 
-import java.sql.*;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,10 @@ public class KeyDao {
             DELETE FROM key
             WHERE user_id = ?
             """;
+    private static final String DELETE_BY_KEY_HASH = """
+            DELETE FROM key
+            WHERE user_id = ? and  key_hash = ?
+            """;
     private static final String FIND_BY_ID_SQL = """
             SELECT id, user_id, key_hash
             FROM key
@@ -41,7 +46,8 @@ public class KeyDao {
             WHERE user_id = ? AND key_hash = ?
             """;
 
-    private KeyDao() {};
+    private KeyDao() {
+    }
 
     public static KeyDao getInstance() {
         return INSTANCE;
@@ -68,6 +74,17 @@ public class KeyDao {
         try (var connection = ConnectionPool.get();
              var preparedStatement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
             preparedStatement.setLong(1, id);
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    public boolean deleteByKeyHash(Long user_id, String keyHash) {
+        try (var connection = ConnectionPool.get();
+             var preparedStatement = connection.prepareStatement(DELETE_BY_KEY_HASH)) {
+            preparedStatement.setLong(1, user_id);
+            preparedStatement.setString(2, keyHash);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -108,7 +125,7 @@ public class KeyDao {
             var resultSet = preparedStatement.executeQuery();
             List<Key> keys = new ArrayList<>();
             while (resultSet.next()) {
-                 keys.add(new Key(resultSet.getLong("id"),
+                keys.add(new Key(resultSet.getLong("id"),
                         resultSet.getLong("user_id"),
                         resultSet.getString("key_hash")));
             }

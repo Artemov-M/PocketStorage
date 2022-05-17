@@ -19,6 +19,9 @@ public final class ConnectionPool {
         initConnectionPool();
     }
 
+    private ConnectionPool() {
+    }
+
     private static void initConnectionPool() {
         var poolSize = PropertiesUtil.get(POOL_SIZE_KEY);
         int size = poolSize == null ? DEFAULT_POOL_SIZE : Integer.parseInt(poolSize);
