@@ -84,6 +84,7 @@ public class Idle extends State {
         var messageId = update.message().messageId();
         bot.execute(new DeleteMessage(chatId, messageId));
         if (update.message().text().equals("/start")) {
+            userState.resetLastMessageId(update.message().messageId(), update.message().chat().id(), bot);
             userState.setState(new Idle(userState, bot));
             // todo
             System.out.println("-19- Прошел Idle.handleMessage команду /start. lastSendMessageId: " +

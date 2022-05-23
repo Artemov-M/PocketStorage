@@ -48,7 +48,13 @@ public class KeyGetValue extends State {
 
     private void handleMessage(Update update) {
         bot.execute(new DeleteMessage(update.message().chat().id(), update.message().messageId()));
-        var keyHash = DigestUtils.sha256Hex(update.message().text());
+        var text = update.message().text();
+        if (text.equals("/start")) {
+            userState.resetLastMessageId(update.message().messageId(), update.message().chat().id(), bot);
+            userState.setState(new Idle(userState, bot));
+            return;
+        }
+        var keyHash = DigestUtils.sha256Hex(text);
         var userDao = UserDao.getInstance();
         var optionalUser = userDao.findByHash(DigestUtils.sha256Hex(userState.getId().toString()));
 

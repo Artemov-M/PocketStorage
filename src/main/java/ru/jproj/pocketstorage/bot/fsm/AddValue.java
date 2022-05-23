@@ -53,7 +53,13 @@ public class AddValue extends State {
     private void handleMessage(Update update) {
         bot.execute(new DeleteMessage(update.message().chat().id(), update.message().messageId()));
         count += 1;
-        ValueDao.getInstance().save(new Value(-1L, keyId, update.message().text()));
+        var text = update.message().text();
+        if (text.equals("/start")) {
+            userState.resetLastMessageId(update.message().messageId(), update.message().chat().id(), bot);
+            userState.setState(new Idle(userState, bot));
+            return;
+        }
+        ValueDao.getInstance().save(new Value(-1L, keyId, text));
         if (count == 10) {
             userState.setState(new Idle(userState, bot));
         }

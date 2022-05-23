@@ -47,10 +47,13 @@ public class KeyDeleteValue extends State {
 
     private void handleMessage(Update update) {
         bot.execute(new DeleteMessage(update.message().chat().id(), update.message().messageId()));
-        var keyHash = DigestUtils.sha256Hex(update.message().text());
+        var text = update.message().text();
+        var keyHash = DigestUtils.sha256Hex(text);
         var optionalUser = UserDao.getInstance().findByHash(
                 DigestUtils.sha256Hex(userState.getId().toString()));
         optionalUser.ifPresent(user -> KeyDao.getInstance().deleteByKeyHash(user.getId(), keyHash));
+        userState.resetLastMessageId(update.message().messageId(), update.message().chat().id(), bot);
+        userState.setState(new Idle(userState, bot));
         // todo
         System.out.println("--- Прошел KeyDeleteValue.handleMessage. lastSendMessageId: " +
                 userState.getLastMessageId());

@@ -74,10 +74,15 @@ public class DeleteAll extends State {
 
     private void handleMessage(Update update) {
         bot.execute(new DeleteMessage(update.message().chat().id(), update.message().messageId()));
-        bot.execute(new EditMessageText(update.message().chat().id(), userState.getLastMessageId(),
-                "***\nДля выполнения других действий нажмите [cancel]\n***\n" + ALL_DELETE_MESSAGE));
+        var text = update.message().text();
+        userState.resetLastMessageId(update.message().messageId(), update.message().chat().id(), bot);
+        userState.setState(new Idle(userState, bot));
+//        bot.execute(new EditMessageText(update.message().chat().id(), userState.getLastMessageId(),
+//                "***\nДля выполнения других действий нажмите [cancel]\n***\n" + ALL_DELETE_MESSAGE));
+//        bot.execute(new EditMessageReplyMarkup(update.message().chat().id(), userState.getLastMessageId())
+//                .replyMarkup(BotKeyboard.reallyDeleteKeyboard));
         // todo заменить на логирование
-        System.out.println("-@- Пришло неизвестное сообщение в DeleteAll отправлено сообщение с меню: " +
+        System.out.println("-@- Пришло неизвестное сообщение в DeleteAll: " +
                 "lastSendMessageId обновлен: " + userState.getLastMessageId());
     }
 
